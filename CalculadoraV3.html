@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Calculadora de riesgo SUCCESS / SUCCESS-Extended</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --card:#ffffff;
+      --soft:#f8fafc;
+      --accent:#0ea5e9;
+      --accent-weak:#e0f2fe;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+    }
+
+    /* BANDA SUPERIOR */
+    #riskBanner{
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:#0f3b66;
+      color:#fff;
+      padding:14px 24px;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+      gap:20px;
+      font-family:inherit;
+    }
+    .rb-pill{
+      border-radius:999px;
+      padding:8px 20px;
+      border:1px solid rgba(255,255,255,.35);
+      font-size:1.1rem;
+      white-space:nowrap;
+      font-weight:700;
+      background:rgba(255,255,255,.12);
+    }
+    .rb-main{
+      font-size:1.7rem;
+      font-weight:800;
+      letter-spacing:.02em;
+      white-space:nowrap;
+    }
+    .rb-cat-pill{
+      background:rgba(15,23,42,.25);
+      font-weight:600;
+    }
+    #rbRecoBtn{
+      color:#e0f2fe;              /* texto celeste clarito */
+     border-color:rgba(255,255,255,.6);
+       background:rgba(15,23,42,.18);
+    }
+      #rbRecoBtn:hover{
+       background:rgba(15,23,42,.08);
+     }
+    .wrap{
+      max-width:1100px;
+      margin:24px auto 40px;
+      padding:0 16px;
+    }
+    header{
+      margin-bottom:18px;
+      position:relative;
+      padding-bottom:12px;
+      border-bottom:1px solid var(--border);
+    }
+    .title-row{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      max-width:820px;
+    }
+    .main-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .main-title h1{
+      font-size:2rem;
+      font-weight:700;
+      margin:0;
+      letter-spacing:.02em;
+    }
+    .badge{
+      font-size:.75rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:var(--soft);
+      color:var(--muted);
+    }
+    .sub-title{
+      font-size:.92rem;
+      color:var(--muted);
+    }
+    .accent-bar{
+      height:4px;
+      border-radius:999px;
+      background:linear-gradient(90deg,#0ea5e9,#22c55e);
+      margin-top:10px;
+      margin-bottom:6px;
+      max-width:260px;
+    }
+    .lang{
+      position:absolute;
+      top:0;
+      right:0;
+      display:flex;
+      gap:6px;
+    }
+    .lang button{
+      font-size:.75rem;
+      border:1px solid var(--border);
+      background:var(--soft);
+      color:var(--muted);
+      border-radius:999px;
+      padding:4px 10px;
+      cursor:pointer;
+    }
+    .lang button.active{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+    }
+
+    .grid{
+      display:grid;
+      gap:16px;
+      grid-template-columns:repeat(12,1fr);
+      margin-top:12px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:0 8px 20px rgba(15,23,42,0.04);
+    }
+    .soft{background:var(--soft);}
+    @media(min-width:820px){
+      .span-7{grid-column:span 7;}
+      .span-5{grid-column:span 5;}
+      .span-12{grid-column:span 12;}
+      aside.card.span-5{position:sticky;top:20px;}
+    }
+    @media(max-width:819px){
+      .span-7,.span-5,.span-12{grid-column:span 12;}
+    }
+
+    h2{font-size:1.08rem;margin:8px 0 6px;}
+    .section{
+      font-size:.8rem;
+      text-transform:uppercase;
+      color:var(--muted);
+      letter-spacing:.12em;
+      margin-bottom:6px;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:.82rem;
+      margin-top:3px;
+    }
+    .row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:.95rem;
+      margin-bottom:8px;
+      flex-wrap:wrap;
+    }
+    .label-text{flex:1;min-width:180px;}
+    .info-btn{
+      border:none;
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:.75rem;
+      background:#e0f2fe;
+      color:#0369a1;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    input[type=number]{
+      width:100%;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:8px 10px;
+      font-size:.95rem;
+      outline:none;
+    }
+    input[type=number]:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px var(--accent-weak);
+    }
+
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:10px 16px;
+      font-weight:600;
+      cursor:pointer;
+      font-size:.9rem;
+    }
+    .btn.primary{background:var(--accent);color:#fff;}
+    .btn.ghost{background:#fff;border:1px solid var(--border);color:var(--text);}
+    .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+
+    .kpi{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:14px;
+    }
+    .kpi-label{
+      font-size:.8rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      margin-bottom:4px;
+    }
+    .kpi-main{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .kpi-val{
+      font-size:1.6rem;
+      font-weight:700;
+    }
+    .risk-block{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:0;
+    }
+
+    .chip{
+      font-size:.8rem;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:var(--soft);
+      white-space:nowrap;
+    }
+    .chip.vlow{border-color:#bbf7d0;background:#f0fdf4;}
+    .chip.low{border-color:#dcfce7;background:#f6fef9;}
+    .chip.mid{border-color:#fde68a;background:#fffbeb;}
+    .chip.high{border-color:#fecaca;background:#fff1f2;}
+
+    details{
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:#fff;
+      padding:10px 12px;
+      margin-bottom:12px;
+    }
+    summary{
+      cursor:pointer;
+      font-weight:600;
+      outline:none;
+    }
+
+    code{
+      background:var(--soft);
+      padding:2px 6px;
+      border-radius:6px;
+      font-size:.85rem;
+    }
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;
+    }
+    .info-img{
+      display:block;
+      max-width:100%;
+      height:auto;
+      border-radius:8px;
+      border:1px solid var(--border);
+      margin:8px 0;
+    }
+
+    /* Modal */
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,0.45);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
+    }
+    .hidden{display:none;}
+    .modal{
+      background:#ffffff;
+      border-radius:16px;
+      max-width:640px;
+      width:90%;
+      max-height:90vh;
+      padding:16px 18px 18px;
+      box-shadow:0 20px 60px rgba(15,23,42,0.35);
+      overflow:auto;
+    }
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .modal-title{font-size:1rem;font-weight:600;}
+    .modal-close{
+      border:none;
+      background:transparent;
+      font-size:1.3rem;
+      cursor:pointer;
+      line-height:1;
+    }
+
+    /* Toggles Sí/No */
+    .toggle-group{
+      display:inline-flex;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid var(--border);
+    }
+    .toggle-btn{
+      border:none;
+      padding:4px 10px;
+      font-size:.8rem;
+      cursor:pointer;
+      background:#e5e7eb;
+    }
+    .toggle-btn.active{
+      background:#0ea5e9;
+      color:#fff;
+    }
+
+    /* Panel bienvenida */
+    #welcomePanel{
+      border:1px solid #fed7aa;
+      background:#fff7ed;
+      border-radius:12px;
+      padding:12px 14px;
+      margin-bottom:16px;
+      font-size:.9rem;
+    }
+    #welcomePanel h2{
+      margin-top:0;
+      font-size:1rem;
+    }
+    #welcomeButtons{
+      margin-top:8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- BANNER SUPERIOR -->
+  <div id="riskBanner">
+    <span id="rbModel" class="rb-pill">—</span>
+    <span id="rbScore" class="rb-pill">Score: —</span>
+    <span id="rbR1" class="rb-main">Riesgo 1 año: —</span>
+    <span id="rbR2" class="rb-main">Riesgo 2 años: —</span>
+    <span id="rbCat" class="rb-pill rb-cat-pill">—</span>
+    <!-- Botón para ver recomendación -->
+    <button id="rbRecoBtn" type="button" class="rb-pill rb-cat-pill hidden">
+      Ver recomendación
+    </button>
+  </div>
+
+  <div class="wrap">
+    <header>
+      <div class="lang">
+        <button class="active" data-lang="es">ES</button>
+        <button data-lang="en">EN</button>
+      </div>
+
+      <div class="title-row">
+        <div class="main-title">
+          <h1 id="title">Calculadora de riesgo SUCCESS / SUCCESS-Extended</h1>
+          <span class="badge" id="badge">Estimador del riesgo de queratoplastia endotelial</span>
+        </div>
+        <p class="sub-title" id="intro">
+          Estima el riesgo de necesitar queratoplastia endotelial por visión subóptima
+          tras cirugía de cataratas en pacientes con distrofia endotelial de Fuchs (FECD),
+          a 1 y 2 años. Cálculo local; no se almacenan datos. Solo deben utilizarse
+          exploraciones Pentacam® con calidad QS óptima.
+        </p>
+      </div>
+
+      <div class="accent-bar"></div>
+    </header>
+
+    <!-- Panel bienvenida -->
+    <section id="welcomePanel">
+      <h2 id="wTitle">Bienvenido/a a la calculadora de riesgo SUCCESS / SUCCESS-Extended</h2>
+      <p id="wText">
+        Antes de utilizar esta herramienta, lea el apartado “Aviso legal ampliado” que figura más abajo,
+        donde se describen su finalidad, limitaciones y condiciones de uso. El uso de la calculadora implica
+        que usted es profesional sanitario y que acepta dichas condiciones.
+      </p>
+      <div id="welcomeButtons">
+        <button class="btn primary" id="wAccept">He leído y acepto</button>
+        <button class="btn ghost" id="wShowLegal">Ver aviso legal</button>
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- FORMULARIO -->
+      <section class="card span-7">
+        <div class="section" id="secInput">Datos para el cálculo</div>
+
+        <h2 id="h1">1. Hallazgos de edema corneal subclínico</h2>
+        <p class="hint" id="h1hint">
+          Hallazgos de edema corneal subclínico definidos por la clasificación de Sun,
+          basados en los mapas centrales de paquimetría y elevación posterior de Pentacam®.
+        </p>
+
+        <div class="row">
+          <span class="label-text" id="l1">Pérdida de isopacas regulares</span>
+          <div class="toggle-group" data-feature="f1">
+            <button type="button" class="toggle-btn" data-value="1">Sí</button>
+            <button type="button" class="toggle-btn active" data-value="0">No</button>
+          </div>
+          <button type="button" class="info-btn" data-modal="isopachs">?</button>
+        </div>
+        <input type="hidden" id="f1" value="0">
+
+        <div class="row">
+          <span class="label-text" id="l2">Desplazamiento del punto más fino</span>
+          <div class="toggle-group" data-feature="f2">
+            <button type="button" class="toggle-btn" data-value="1">Sí</button>
+            <button type="button" class="toggle-btn active" data-value="0">No</button>
+          </div>
+          <button type="button" class="info-btn" data-modal="thinnest">?</button>
+        </div>
+        <input type="hidden" id="f2" value="0">
+
+        <div class="row">
+          <span class="label-text" id="l3">Depresión focal de la superficie posterior</span>
+          <div class="toggle-group" data-feature="f3">
+            <button type="button" class="toggle-btn" data-value="1">Sí</button>
+            <button type="button" class="toggle-btn active" data-value="0">No</button>
+          </div>
+          <button type="button" class="info-btn" data-modal="posterior">?</button>
+        </div>
+        <input type="hidden" id="f3" value="0">
+
+        <p class="hint" id="featHelp">
+          0 hallazgos = 0 pts; 1 hallazgo = 4 pts; 2–3 hallazgos = 5 pts.
+        </p>
+
+        <h2 id="h2">2. Paquimetría central</h2>
+        <div class="row">
+          <label for="cct" id="cctLab" class="label-text">Paquimetría en centro pupilar (µm)</label>
+          <button type="button" class="info-btn" data-modal="pachy">?</button>
+        </div>
+        <input type="number" id="cct" placeholder="p. ej. 630" min="400" max="800" step="1">
+        <p class="hint" id="cctHint">Entre 400 y 800 µm. ≤550 → 0; 551–609 → 1; 610–651 → 2; ≥652 → 3 puntos.</p>
+
+        <h2 id="h3">3. Densitometría media central (SUCCESS-Extended)</h2>
+        <div class="row">
+          <label for="dens" id="densLab" class="label-text">Máximo valor central de densitometría media</label>
+          <button type="button" class="info-btn" data-modal="denso">?</button>
+        </div>
+        <input type="number" id="dens" placeholder="p. ej. 21.5" min="10" max="50" step="0.1">
+        <p class="hint" id="densHint">
+          Rango permitido 10–50. Si se introduce densitometría se usa SUCCESS-Extended; si es ≥21.2 → +4 puntos.
+          Si se deja vacío, se usa SUCCESS base (0–8 puntos).
+        </p>
+
+        <div class="btns">
+          <button class="btn primary" id="calcBtn">Calcular riesgo</button>
+          <button class="btn ghost" id="resetBtn">Limpiar</button>
+        </div>
+        <p class="hint" id="localNote">
+          El cálculo se realiza íntegramente en su navegador; no se envían ni almacenan datos.
+        </p>
+      </section>
+
+      <!-- RESULTADOS LATERALES -->
+      <aside class="card span-5 soft">
+        <div class="section" id="secRes">Resultados</div>
+
+        <div class="kpi">
+          <div class="kpi-label" id="scoreLbl">Score SUCCESS / SUCCESS-Extended</div>
+          <div class="kpi-main">
+            <div>
+              <div class="kpi-val mono" id="scoreOut">—</div>
+              <div class="hint" id="modelOut">Modelo: —</div>
+            </div>
+            <span class="chip mono" id="betaChip">β: —</span>
+          </div>
+        </div>
+
+        <div style="height:8px"></div>
+
+        <div class="kpi">
+          <div class="kpi-label" id="riskLbl">Probabilidad estimada</div>
+          <div class="kpi-main">
+            <div class="risk-block">
+              <div class="kpi-val mono" id="r1">—</div>
+              <div>
+                <span class="chip" id="r1band">—</span>
+                <span class="hint" id="r1lbl">A 1 año</span>
+              </div>
+            </div>
+            <div class="risk-block">
+              <div class="kpi-val mono" id="r2">—</div>
+              <span class="hint" id="r2lbl">A 2 años</span>
+            </div>
+          </div>
+          <p class="hint" id="bandsLegend"></p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- INFO / FINANCIACIÓN / LEGAL -->
+    <section class="card span-12" style="margin-top:16px">
+      <div class="section" id="infoSec">Información, financiación y aviso legal</div>
+
+      <details>
+        <summary id="mSum">Marco del modelo y origen de SUCCESS</summary>
+        <div id="mTxt"></div>
+      </details>
+
+      <details>
+        <summary id="explSum">Cómo medir en Pentacam / interpretación</summary>
+        <div id="explTxt"></div>
+      </details>
+
+      <details>
+        <summary id="fundingSum">Financiación</summary>
+        <div id="fundingTxt"></div>
+      </details>
+
+      <details>
+        <summary id="lSum">Aviso legal ampliado</summary>
+        <div id="lTxt"></div>
+      </details>
+    </section>
+  </div>
+
+  <!-- MODAL EXPLICATIVO / RECOMENDACIONES -->
+  <div id="modalOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle"></div>
+        <button class="modal-close" id="modalClose" aria-label="Cerrar">×</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    // Parámetros recalibrados
+    const PARAMS = {
+      base: {
+        beta: 0.48943,
+        s01: 0.980,   // recalibrado: score 7 ~61%, score 8 ~78% a 1 año
+        s02: 0.964,   // ~+5% a 2 años
+        nameES:"SUCCESS (base)",
+        nameEN:"SUCCESS (base)"
+      },
+      ext: {
+        beta: 0.41163,
+        s01: 0.987,   // misma calibración base para coherencia
+        s02: 0.976,
+        nameES:"SUCCESS-Extended",
+        nameEN:"SUCCESS-Extended"
+      }
+    };
+
+    let lang = 'es';
+    let acceptedTerms = false;
+    let lastRecoKey = null; // clave de la última banda de riesgo
+
+    const modalContents = {
+      isopachs:{
+        title:{es:"Pérdida de isopacas regulares",en:"Loss of regular isopachs"},
+        body:{
+          es:`
+            <p>Valorar en el mapa paquimétrico central de Pentacam®.</p>
+            <ul>
+              <li>En córneas normales las isopacas (líneas de igual grosor) son aproximadamente concéntricas.</li>
+              <li>En el edema subclínico se observa distorsión o rotura de ese patrón regular en la zona central.</li>
+            </ul>
+            <img class="info-img" src="isopachs.png" alt="Ejemplo de mapa paquimétrico en Pentacam (isopacas)">
+          `,
+          en:`
+            <p>Assess the central pachymetry map in Pentacam®.</p>
+            <ul>
+              <li>Normal corneas show approximately concentric isopachs.</li>
+              <li>Subclinical edema distorts this regular pattern in the central zone.</li>
+            </ul>
+            <img class="info-img" src="isopachs.png" alt="Pentacam pachymetry example (isopachs)">
+          `
+        }
+      },
+      thinnest:{
+        title:{es:"Desplazamiento del punto más fino",en:"Displacement of the thinnest point"},
+        body:{
+          es:`
+            <p>Usar la marca de “thinnest location” de Pentacam®.</p>
+            <ul>
+              <li>En córnea normal suele ser próximo al centro pupilar.</li>
+              <li>Se considera desplazado cuando está claramente excéntrico respecto al centro de la pupila.</li>
+            </ul>
+            <img class="info-img" src="thinnest.png" alt="Ejemplo de punto más fino en Pentacam">
+          `,
+          en:`
+            <p>Use the “thinnest location” marker in Pentacam®.</p>
+            <ul>
+              <li>Normally close to the pupillary centre.</li>
+              <li>Considered displaced when clearly eccentric relative to the pupil centre.</li>
+            </ul>
+            <img class="info-img" src="thinnest.png" alt="Thinnest point example">
+          `
+        }
+      },
+      posterior:{
+        title:{es:"Depresión focal de la superficie posterior",en:"Focal posterior surface depression"},
+        body:{
+          es:`
+            <p>Valorar el mapa de elevación posterior.</p>
+            <ul>
+              <li>Buscar una zona focal deprimida compatible con edema subclínico.</li>
+              <li>Debe diferenciarse de patrones propios del queratocono u otras ectasias.</li>
+            </ul>
+            <img class="info-img" src="posterior.png" alt="Mapa de elevación posterior en Pentacam">
+          `,
+          en:`
+            <p>Assess the posterior elevation map.</p>
+            <ul>
+              <li>Identify a focal depressed area compatible with subclinical edema.</li>
+              <li>It should be differentiated from keratoconus or ectatic patterns.</li>
+            </ul>
+            <img class="info-img" src="posterior.png" alt="Posterior elevation map">
+          `
+        }
+      },
+      pachy:{
+        title:{es:"Paquimetría central",en:"Central pachymetry"},
+        body:{
+          es:`
+            <p>Registrar la paquimetría en el centro pupilar en µm.</p>
+            <ul>
+              <li>Utilizar solo exploraciones Pentacam® con calidad QS óptima.</li>
+              <li>Introducir el valor numérico en micras tal como aparece en el informe (sin decimales).</li>
+            </ul>
+          `,
+          en:`
+            <p>Enter pachymetry at the pupillary centre in µm.</p>
+            <ul>
+              <li>Use only Pentacam® scans with optimal QS quality.</li>
+              <li>Type the numeric value in microns as reported by the device (integer, no decimals).</li>
+            </ul>
+          `
+        }
+      },
+      denso:{
+        title:{es:"Densitometría media central",en:"Central mean densitometry"},
+        body:{
+          es:`
+            <p>Usar el análisis de densitometría de Pentacam®.</p>
+            <ul>
+              <li>Seleccionar el valor medio máximo en la zona central.</li>
+              <li>Valores entre 10 y 50; se permite un decimal como máximo.</li>
+              <li>Valores ≥21.2 añaden 4 puntos en SUCCESS-Extended.</li>
+            </ul>
+            <img class="info-img" src="densitometry.png" alt="Densitometría en Pentacam">
+          `,
+          en:`
+            <p>Use Pentacam® densitometry analysis.</p>
+            <ul>
+              <li>Record the maximum central mean densitometry value.</li>
+              <li>Range 10–50; up to one decimal place is allowed.</li>
+              <li>Values ≥21.2 add 4 points in SUCCESS-Extended.</li>
+            </ul>
+            <img class="info-img" src="densitometry.png" alt="Pentacam densitometry">
+          `
+        }
+      }
+    };
+
+    const T = {
+      es:{
+        title:"Calculadora de riesgo SUCCESS / SUCCESS-Extended",
+        badge:"Estimador del riesgo de queratoplastia endotelial",
+        intro:`Estima el riesgo de necesitar queratoplastia endotelial por visión subóptima
+               tras cirugía de cataratas en pacientes con distrofia endotelial de Fuchs (FECD),
+               a 1 y 2 años. Cálculo local; no se almacenan datos. Solo deben utilizarse
+               exploraciones Pentacam® con calidad QS óptima.`,
+        wTitle:"Bienvenido/a a la calculadora de riesgo SUCCESS / SUCCESS-Extended",
+        wText:`Antes de utilizar esta herramienta, lea el apartado “Aviso legal ampliado” que figura más abajo,
+               donde se describen su finalidad, limitaciones y condiciones de uso. El uso de la calculadora implica
+               que usted es profesional sanitario y que acepta dichas condiciones.`,
+        wAccept:"He leído y acepto",
+        wShowLegal:"Ver aviso legal",
+
+        secInput:"Datos para el cálculo",
+        h1:"1. Hallazgos de edema corneal subclínico",
+        h1hint:"Hallazgos de edema corneal subclínico definidos por la clasificación de Sun, basados en los mapas centrales de paquimetría y elevación posterior de Pentacam®.",
+        l1:"Pérdida de isopacas regulares",
+        l2:"Desplazamiento del punto más fino",
+        l3:"Depresión focal de la superficie posterior",
+        featHelp:"0 hallazgos = 0 pts; 1 hallazgo = 4 pts; 2–3 hallazgos = 5 pts.",
+        h2:"2. Paquimetría central",
+        cctLab:"Paquimetría en centro pupilar (µm)",
+        cctHint:"Entre 400 y 800 µm. ≤550 → 0; 551–609 → 1; 610–651 → 2; ≥652 → 3 puntos.",
+        h3:"3. Densitometría media central (SUCCESS-Extended)",
+        densLab:"Máximo valor central de densitometría media",
+        densHint:"Rango permitido 10–50. Si es ≥21.2 → +4 puntos (SUCCESS-Extended). Si se deja vacío → SUCCESS base.",
+        calc:"Calcular riesgo",
+        reset:"Limpiar",
+        localNote:"El cálculo se realiza íntegramente en su navegador; no se envían ni almacenan datos.",
+        secRes:"Resultados",
+        scoreLbl:"Score SUCCESS / SUCCESS-Extended",
+        riskLbl:"Probabilidad estimada",
+        r1lbl:"A 1 año",
+        r2lbl:"A 2 años",
+        infoSec:"Información, financiación y aviso legal",
+        mSum:"Marco del modelo y origen de SUCCESS",
+        explSum:"Cómo medir en Pentacam / interpretación",
+        fundingSum:"Financiación",
+        lSum:"Aviso legal ampliado",
+        model:"Modelo",
+        verylow:"Riesgo muy bajo",
+        low:"Riesgo bajo",
+        mid:"Riesgo intermedio",
+        high:"Riesgo alto",
+        rbScoreLabel:"Score",
+        rbR1Label:"Riesgo 1 año",
+        rbR2Label:"Riesgo 2 años",
+        bandsLegend:`<strong>En este estudio, el riesgo a 1 año se clasifica como:</strong><br>
+          Muy bajo: &lt;5%<br>
+          Bajo: 5–&lt;20%<br>
+          Intermedio: 20–50%<br>
+          Alto: &gt;50%`,
+
+        // Textos recomendación
+        recoBtn:"Ver recomendación",
+        recoTitle:"Recomendación orientativa según riesgo",
+        recoNoRisk:"Calcule primero el riesgo (introduzca los datos y pulse «Calcular riesgo») para ver una recomendación orientativa.",
+        recoDisclaimer:`
+          Las recomendaciones anteriores son orientativas, se basan en el riesgo estimado por los modelos SUCCESS / SUCCESS-Extended
+          y no sustituyen el juicio clínico individual ni las guías locales. Deben aplicarse únicamente en contextos similares a la cohorte
+          de desarrollo (cataratas sin complicaciones mayores). En situaciones extremas, como cataratas muy duras, cámaras anteriores muy
+          estrechas, mala dilatación, sinequias, cirugía de glaucoma o cirugía intraocular previa compleja, las probabilidades reales de
+          descompensación corneal pueden diferir de las estimadas y la decisión debe basarse en una valoración clínica completa.
+        `,
+        recoTexts:{
+          vlow:`
+            Riesgo muy bajo (&lt;5% a 1 año). En esta situación suele recomendarse cirugía de cataratas mediante facoemulsificación
+            con medidas estándar de protección endotelial (control de energía, uso adecuado de viscoelásticos protectores, etc.),
+            realizada por un cirujano con experiencia en cirugía de cataratas en un centro con volumen y recursos adecuados.
+            No es aconsejable que la cirugía la realice un cirujano muy junior sin supervisión directa, aunque el modelo sugiera
+            un riesgo bajo de queratoplastia endotelial.
+          `,
+          low:`
+            Riesgo bajo (5–&lt;20% a 1 año). En general puede plantearse una cirugía de cataratas estándar en un centro que cuente
+            con experiencia en cirugía de cataratas y/o disponga de una vía clara de derivación ágil a una unidad de córnea o a
+            un centro donde se realice queratoplastia endotelial, en caso de descompensación corneal posoperatoria. Es recomendable
+            informar al paciente de este riesgo, acordar un plan de seguimiento y asegurarse de que existe un circuito eficiente
+            de derivación.
+          `,
+          mid:`
+            Riesgo intermedio (20–50% a 1 año). Se recomienda explicar de forma detallada al paciente el riesgo de descompensación
+            corneal y la posible necesidad de cirugía de trasplante endotelial en el futuro. La cirugía debería programarse con un
+            especialista en cataratas con experiencia en patología corneal, preferiblemente en un centro con capacidad para realizar
+            queratoplastia endotelial. Es aconsejable organizar de antemano un circuito asistencial que contemple la eventual necesidad
+            de trasplante de rescate y un seguimiento estrecho durante el primer año posoperatorio.
+          `,
+          high:`
+            Riesgo alto (&gt;50% a 1 año). En este contexto, la decisión debe individualizarse y discutirse cuidadosamente con el paciente.
+            Puede considerarse la cirugía en centros con amplia experiencia en queratoplastia endotelial y, en algunos casos, valorar
+            una cirugía combinada (faco + queratoplastia endotelial) o una estrategia escalonada (queratoplastia primero y cirugía de
+            cataratas posteriormente) para optimizar la predictibilidad refractiva y la recuperación visual. Es esencial documentar la
+            información facilitada y las preferencias del paciente.
+          `
+        },
+
+        mTxtHTML: `
+          <p>
+            El acrónimo <strong>SUCCESS</strong> corresponde a
+            <em>SUbClinical Corneal Edema Scheimpflug Study</em>. El modelo combina
+            hallazgos tomográficos centrales y paquimetría para estimar el riesgo de
+            requerir queratoplastia endotelial tras cirugía de cataratas en FECD.
+          </p>
+          <p>
+            La función de supervivencia condicional se calcula como
+            <code>S(t | s) = S₀(t)<sup>exp(β·s)</sup></code>,
+            y el riesgo estimado es <code>R(t) = 1 − S(t | s)</code>.
+          </p>
+          <ul>
+            <li><strong>SUCCESS base</strong>: β = 0.48943; S₀(1 año) ≈ 0.970; S₀(2 años) ≈ 0.965.</li>
+            <li><strong>SUCCESS-Extended</strong>: β = 0.41163; S₀(1 año) ≈ 0.970; S₀(2 años) ≈ 0.965.</li>
+          </ul>
+          <p>
+            En SUCCESS-Extended se añade la variable de densitometría media central, no incluida en el
+            modelo original, para refinar la estratificación del riesgo en estadios más avanzados.
+          </p>
+          <p>
+            Los hallazgos tomográficos centrales se basan en la clasificación de edema subclínico
+            propuesta por Sun SY et al. (<em>Ophthalmology</em> 2019;126(2):195–204), utilizando
+            mapas de paquimetría y elevación posterior de Pentacam®.
+          </p>
+          <p>
+            La presente calculadora deriva del modelo descrito en:
+            <br>
+            <em>Arnalich-Montiel F, de-Arriba-Palomero P, Muriel A, Mingo-Botín D.
+            A Risk Prediction Model for Endothelial Keratoplasty After Uncomplicated Cataract Surgery
+            in Fuchs Endothelial Corneal Dystrophy. Am J Ophthalmol. 2021;231:70–78.
+            doi:10.1016/j.ajo.2021.04.016.</em>
+          </p>
+          <p>
+            Este modelo se ha <strong>validado externamente en un estudio multicéntrico en 5 centros españoles</strong>
+            (manuscrito sometido a revisión por pares).
+          </p>
+          <p>
+            Como en cualquier modelo predictivo preoperatorio, los factores intraoperatorios no se capturan por completo.
+            El algoritmo SUCCESS está diseñado para estimar el riesgo <em>antes</em> de la cirugía y no incorpora la
+            variabilidad asociada a <strong>situaciones extremas</strong> (por ejemplo, cristalinos muy duros, cámaras
+            anteriores estrechas, tiempos quirúrgicos prolongados), ni las complicaciones intraoperatorias ni la curva
+            de aprendizaje del cirujano. El modelo está pensado para casos de facoemulsificación no complicada
+            (<em>“straightforward cataracts”</em>).
+          </p>
+          <p>
+            El modelo está calibrado específicamente para tomografía de Scheimpflug obtenida con Pentacam®.
+            No debe extrapolarse a otros dispositivos sin validación independiente.
+          </p>
+        `,
+
+        explTxtHTML: `
+          <p>Todos los hallazgos se valoran en la zona central (~4 mm) de los mapas de Pentacam®:</p>
+          <ul>
+            <li><strong>Pérdida de isopacas regulares</strong>: en el mapa paquimétrico central
+                las líneas de igual grosor dejan de ser concéntricas y muestran distorsión.</li>
+            <li><strong>Desplazamiento del punto más fino</strong>: el punto de mínima paquimetría
+                aparece excéntrico respecto al centro pupilar.</li>
+            <li><strong>Depresión focal de superficie posterior</strong>: zona focal hundida en el
+                mapa de elevación posterior compatible con edema subclínico.</li>
+            <li><strong>Densitometría media central</strong>: utilizar el informe de densitometría
+                y registrar el valor medio máximo central.</li>
+          </ul>
+          <p class="hint">
+            Se recomienda definir un protocolo interno que especifique qué pantallas revisar
+            sistemáticamente antes de introducir los datos en la calculadora.
+          </p>
+        `,
+
+        fundingTxtHTML: `
+          <p>
+            Este trabajo ha sido financiado por el <strong>Instituto de Salud Carlos III (ISCIII)</strong>
+            a través del proyecto <strong>FIS-PI22/01252</strong>, en el marco del Plan Estatal de
+            Investigación Científica y Técnica y de Innovación, y
+            <strong>cofinanciado por la Unión Europea – NextGenerationEU</strong>.
+          </p>
+          <p>
+            El desarrollo de esta calculadora se realiza en el contexto del
+            <strong>Instituto Ramón y Cajal de Investigación Sanitaria (IRYCIS)</strong> y de los
+            servicios clínicos participantes.
+          </p>
+        `,
+
+        lTxtHTML: `
+          <p><strong>Alcance y naturaleza de la herramienta</strong></p>
+          <p>
+            Esta calculadora se ha diseñado como herramienta de apoyo a la decisión clínica y de
+            investigación. No constituye un <em>producto sanitario</em> ni un dispositivo médico
+            certificado conforme al Reglamento (UE) 2017/745 (MDR) ni a la normativa estadounidense
+            (FDA). No dispone de marcado CE ni de autorización regulatoria para su uso como
+            herramienta diagnóstica o de indicación terapéutica.
+          </p>
+          <p><strong>Limitaciones de uso</strong></p>
+          <ul>
+            <li>No debe utilizarse como única base para indicar o descartar cirugía de córnea o catarata.</li>
+            <li>No está destinada a uso directo por pacientes ni por personal no especializado.</li>
+            <li>
+              Solo es aplicable a exploraciones realizadas con Pentacam® (tomografía de Scheimpflug)
+              con calidad QS óptima y en un contexto clínico similar al de la cohorte de desarrollo.
+            </li>
+            <li>
+              Los resultados deben interpretarse siempre junto con la historia clínica, la exploración
+              oftalmológica completa y el criterio del especialista.
+            </li>
+          </ul>
+          <p><strong>Responsabilidad</strong></p>
+          <p>
+            Aunque se han seguido buenas prácticas metodológicas en el desarrollo del modelo,
+            los autores, las instituciones participantes y los organismos financiadores no
+            garantizan la exactitud ni la exhaustividad de las estimaciones proporcionadas.
+            El uso de la herramienta se realiza bajo la exclusiva responsabilidad del profesional
+            que la consulta.
+          </p>
+          <p>
+            Ni los autores, ni sus instituciones, ni el ISCIII, ni la Unión Europea asumirán
+            responsabilidad legal por daños directos o indirectos derivados del uso clínico,
+            quirúrgico o de cualquier otra naturaleza que se base de forma exclusiva o
+            predominante en los resultados de esta calculadora.
+          </p>
+          <p><strong>Protección de datos</strong></p>
+          <p>
+            El cálculo se realiza íntegramente de forma local en el navegador del usuario.
+            No se almacenan ni se transmiten datos personales a servidores externos a través
+            de esta herramienta.
+          </p>
+        `
+      },
+
+      en:{
+        title:"SUCCESS / SUCCESS-Extended Risk Calculator",
+        badge:"Risk estimator for endothelial keratoplasty",
+        intro:`Estimates the 1- and 2-year risk of requiring endothelial keratoplasty for
+               suboptimal vision after cataract surgery in FECD patients. Local computation;
+               no data are stored. Only Pentacam® scans with optimal QS quality should be used.`,
+        wTitle:"Welcome to the SUCCESS / SUCCESS-Extended Risk Calculator",
+        wText:`Before using this tool, please read the “Extended legal notice” section below,
+               where its purpose, limitations and conditions of use are described. Using the
+               calculator implies that you are a healthcare professional and that you accept
+               these conditions.`,
+        wAccept:"I have read and accept",
+        wShowLegal:"View legal notice",
+
+        secInput:"Input data for the model",
+        h1:"1. Subclinical corneal edema findings",
+        h1hint:"Subclinical corneal edema findings as defined by Sun’s classification, based on central pachymetry and posterior elevation maps on Pentacam®.",
+        l1:"Loss of regular isopachs",
+        l2:"Displacement of the thinnest point",
+        l3:"Focal posterior surface depression",
+        featHelp:"0 findings = 0 pts; 1 finding = 4 pts; 2–3 findings = 5 pts.",
+        h2:"2. Central pachymetry",
+        cctLab:"Pachymetry at pupillary centre (µm)",
+        cctHint:"Allowed range 400–800 µm. ≤550 → 0; 551–609 → 1; 610–651 → 2; ≥652 → 3 pts.",
+        h3:"3. Central mean densitometry (SUCCESS-Extended)",
+        densLab:"Maximum central mean densitometry value",
+        densHint:"Allowed range 10–50. If ≥21.2 → +4 points (SUCCESS-Extended). If left blank → base SUCCESS.",
+        calc:"Calculate risk",
+        reset:"Reset",
+        localNote:"All computations run locally in your browser; no data are sent or stored.",
+        secRes:"Results",
+        scoreLbl:"SUCCESS / SUCCESS-Extended score",
+        riskLbl:"Estimated probability",
+        r1lbl:"At 1 year",
+        r2lbl:"At 2 years",
+        infoSec:"Information, funding and legal notice",
+        mSum:"Model framework and SUCCESS origin",
+        explSum:"How to measure on Pentacam / interpretation",
+        fundingSum:"Funding",
+        lSum:"Extended legal notice",
+        model:"Model",
+        verylow:"Very low risk",
+        low:"Low risk",
+        mid:"Intermediate risk",
+        high:"High risk",
+        rbScoreLabel:"Score",
+        rbR1Label:"1-year risk",
+        rbR2Label:"2-year risk",
+        bandsLegend:`<strong>In this study, 1-year risk is categorised as:</strong><br>
+          Very low: &lt;5%<br>
+          Low: 5–&lt;20%<br>
+          Intermediate: 20–50%<br>
+          High: &gt;50%`,
+
+        // Recommendation texts
+        recoBtn:"View recommendation",
+        recoTitle:"Suggested plan according to risk",
+        recoNoRisk:"Please calculate the risk first (enter the data and click “Calculate risk”) to see a suggested plan.",
+        recoDisclaimer:`
+          The suggestions above are purely orientative, based on the risk estimated by the SUCCESS / SUCCESS-Extended models,
+          and do not replace individual clinical judgement or local guidelines. They should only be applied in settings similar
+          to the development cohort (uncomplicated cataract surgery). In extreme situations such as very hard cataracts, shallow
+          anterior chambers, poor dilation, synechiae, glaucoma surgery or complex previous intraocular surgery, the actual risk
+          of corneal decompensation may differ from the estimate and decisions should rely on a comprehensive clinical assessment.
+        `,
+        recoTexts:{
+          vlow:`
+            Very low risk (&lt;5% at 1 year). In this scenario, cataract surgery by phacoemulsification with standard endothelial
+            protection measures (careful energy management, appropriate use of protective viscoelastics, etc.) is usually
+            recommended, performed by an experienced cataract surgeon in a centre with adequate volume and resources. It is not
+            advisable for a very junior surgeon to perform the procedure without direct supervision, even if the model suggests
+            a low probability of endothelial keratoplasty.
+          `,
+          low:`
+            Low risk (5–&lt;20% at 1 year). Standard cataract surgery can generally be planned in a centre with experience in cataract
+            surgery and/or a clearly established referral pathway to a corneal unit where endothelial keratoplasty is available,
+            should postoperative corneal decompensation occur. It is advisable to inform the patient about this risk, agree on a
+            follow-up plan and ensure that an efficient referral circuit is in place.
+          `,
+          mid:`
+            Intermediate risk (20–50% at 1 year). A detailed discussion with the patient about the risk of corneal decompensation
+            and the potential need for endothelial keratoplasty is recommended. Surgery should preferably be scheduled with a cataract
+            specialist experienced in corneal disease, ideally in a centre with endothelial keratoplasty capability. It is advisable to
+            arrange in advance an assistance pathway that includes the possibility of rescue keratoplasty and close follow-up during the
+            first postoperative year.
+          `,
+          high:`
+            High risk (&gt;50% at 1 year). In this context, decisions should be highly individualised and carefully discussed with the patient.
+            Surgery should be considered in centres with extensive experience in endothelial keratoplasty and, in some cases, a combined
+            procedure (phaco + endothelial keratoplasty) or a staged strategy (keratoplasty first and cataract surgery later) may be
+            considered to improve refractive predictability and visual recovery. It is essential to document the information given and
+            the patient’s preferences.
+          `
+        },
+
+        mTxtHTML: `
+          <p>
+            <strong>SUCCESS</strong> stands for
+            <em>SUbClinical Corneal Edema Scheimpflug Study</em>. The model combines central
+            tomographic findings and pachymetry to estimate the risk of requiring endothelial
+            keratoplasty after cataract surgery in FECD patients.
+          </p>
+          <p>
+            Conditional survival is computed as
+            <code>S(t | s) = S₀(t)<sup>exp(β·s)</sup></code>,
+            and risk as <code>R(t) = 1 − S(t | s)</code>.
+          </p>
+          <ul>
+            <li><strong>Base SUCCESS</strong>: β = 0.48943; S₀(1 year) ≈ 0.970; S₀(2 years) ≈ 0.965.</li>
+            <li><strong>SUCCESS-Extended</strong>: β = 0.41163; S₀(1 year) ≈ 0.970; S₀(2 years) ≈ 0.965.</li>
+          </ul>
+          <p>
+            In SUCCESS-Extended, central mean densitometry is added to the original model
+            to refine risk stratification in more advanced stages.
+          </p>
+          <p>
+            Central tomographic findings are based on the subclinical edema classification by
+            Sun SY et al. (<em>Ophthalmology</em> 2019;126(2):195–204), using Pentacam®
+            pachymetry and posterior elevation maps.
+          </p>
+          <p>
+            This calculator is derived from the model described in:
+            <br>
+            <em>Arnalich-Montiel F, de-Arriba-Palomero P, Muriel A, Mingo-Botín D.
+            A Risk Prediction Model for Endothelial Keratoplasty After Uncomplicated Cataract Surgery
+            in Fuchs Endothelial Corneal Dystrophy. Am J Ophthalmol. 2021;231:70–78.
+            doi:10.1016/j.ajo.2021.04.016.</em>
+          </p>
+          <p>
+            The model has been <strong>externally validated in a multicentre study including 5 Spanish centres</strong>
+            (manuscript under peer review).
+          </p>
+          <p>
+            As in any preoperative predictive model, intraoperative factors cannot be fully captured.
+            The SUCCESS algorithm is designed to estimate risk <em>before</em> surgery and does not incorporate
+            variability related to <strong>extreme situations</strong> such as very hard cataracts, shallow anterior
+            chambers or markedly prolonged surgical times, nor intraoperative complications or surgeon learning curves.
+            The model is intended for uncomplicated phacoemulsification cases (<em>“straightforward cataracts”</em>).
+          </p>
+          <p>
+            The model has been calibrated specifically for Scheimpflug tomography acquired with
+            Pentacam®. It should not be directly extrapolated to other devices without
+            independent validation.
+          </p>
+        `,
+
+        explTxtHTML: `
+          <p>All findings are assessed in the central zone (~4 mm) on Pentacam® maps:</p>
+          <ul>
+            <li><strong>Loss of regular isopachs</strong>: in the central pachymetry map, isopachs
+                are no longer concentric and show distortion.</li>
+            <li><strong>Displacement of the thinnest point</strong>: the thinnest location appears
+                eccentrically displaced relative to the pupillary centre.</li>
+            <li><strong>Focal posterior surface depression</strong>: focal depressed area in the
+                posterior elevation map compatible with subclinical edema.</li>
+            <li><strong>Central mean densitometry</strong>: use Pentacam® densitometry and record
+                the maximal central mean value.</li>
+          </ul>
+          <p class="hint">
+            We recommend defining an internal protocol specifying which Pentacam® screens should
+            be reviewed systematically before entering data into the calculator.
+          </p>
+        `,
+
+        fundingTxtHTML: `
+          <p>
+            This work was funded by the <strong>Instituto de Salud Carlos III (ISCIII)</strong>
+            through project <strong>FIS-PI22/01252</strong>, within the Spanish National Plan
+            for Scientific and Technical Research and Innovation, and
+            <strong>co-funded by the European Union – NextGenerationEU</strong>.
+          </p>
+          <p>
+            The calculator has been developed within the framework of the
+            <strong>Ramón y Cajal Institute for Health Research (IRYCIS)</strong> and
+            participating clinical departments.
+          </p>
+        `,
+
+        lTxtHTML: `
+          <p><strong>Scope and nature of the tool</strong></p>
+          <p>
+            This calculator is intended as a clinical decision-support and research tool.
+            It does not constitute a <em>medical device</em> under EU Regulation 2017/745 (MDR)
+            or US FDA regulations. It has no CE marking and no regulatory approval as a
+            diagnostic or therapeutic decision-making device.
+          </p>
+          <p><strong>Limitations of use</strong></p>
+          <ul>
+            <li>It must not be used as the sole basis for indicating or withholding corneal or cataract surgery.</li>
+            <li>It is not intended for direct use by patients or non-specialist staff.</li>
+            <li>
+              It applies only to Pentacam® Scheimpflug scans with optimal QS quality and
+              in a clinical context similar to the development cohort.
+            </li>
+            <li>
+              Results must always be interpreted together with clinical history, full
+              ophthalmic examination and specialist judgement.
+            </li>
+          </ul>
+          <p><strong>Liability</strong></p>
+          <p>
+            Although good methodological practices have been followed, the authors,
+            participating institutions and funding bodies do not guarantee the accuracy
+            or completeness of the estimates provided. Use of the tool is under the sole
+            responsibility of the healthcare professional.
+          </p>
+          <p>
+            Neither the authors, nor their institutions, nor ISCIII, nor the European Union
+            shall be liable for any direct or indirect damages arising from clinical,
+            surgical or other decisions based exclusively or predominantly on this
+            calculator.
+          </p>
+          <p><strong>Data protection</strong></p>
+          <p>
+            All computations are performed locally in the user's browser.
+            No personal data are stored or transmitted via this tool.
+          </p>
+        `
+      }
+    };
+
+    function setLang(l){
+      lang = l;
+      const t = T[l];
+
+      document.getElementById("title").textContent = t.title;
+      document.getElementById("badge").textContent = t.badge;
+      document.getElementById("intro").textContent = t.intro;
+
+      document.getElementById("wTitle").textContent = t.wTitle;
+      document.getElementById("wText").textContent = t.wText;
+      document.getElementById("wAccept").textContent = t.wAccept;
+      document.getElementById("wShowLegal").textContent = t.wShowLegal;
+
+      document.getElementById("secInput").textContent = t.secInput;
+
+      document.getElementById("h1").textContent = t.h1;
+      document.getElementById("h1hint").textContent = t.h1hint;
+      document.getElementById("l1").textContent = t.l1;
+      document.getElementById("l2").textContent = t.l2;
+      document.getElementById("l3").textContent = t.l3;
+      document.getElementById("featHelp").textContent = t.featHelp;
+
+      document.getElementById("h2").textContent = t.h2;
+      document.getElementById("cctLab").textContent = t.cctLab;
+      document.getElementById("cctHint").textContent = t.cctHint;
+
+      document.getElementById("h3").textContent = t.h3;
+      document.getElementById("densLab").textContent = t.densLab;
+      document.getElementById("densHint").textContent = t.densHint;
+
+      document.getElementById("calcBtn").textContent = t.calc;
+      document.getElementById("resetBtn").textContent = t.reset;
+      document.getElementById("localNote").textContent = t.localNote;
+
+      document.getElementById("secRes").textContent = t.secRes;
+      document.getElementById("scoreLbl").textContent = t.scoreLbl;
+      document.getElementById("riskLbl").textContent = t.riskLbl;
+      document.getElementById("r1lbl").textContent = t.r1lbl;
+      document.getElementById("r2lbl").textContent = t.r2lbl;
+
+      document.getElementById("infoSec").textContent = t.infoSec;
+      document.getElementById("mSum").textContent = t.mSum;
+      document.getElementById("explSum").textContent = t.explSum;
+      document.getElementById("fundingSum").textContent = t.fundingSum;
+      document.getElementById("lSum").textContent = t.lSum;
+
+      document.getElementById("bandsLegend").innerHTML = t.bandsLegend;
+      document.getElementById("mTxt").innerHTML = t.mTxtHTML;
+      document.getElementById("explTxt").innerHTML = t.explTxtHTML;
+      document.getElementById("fundingTxt").innerHTML = t.fundingTxtHTML;
+      document.getElementById("lTxt").innerHTML = t.lTxtHTML;
+
+      // Texto del botón de recomendación del banner
+      document.getElementById("rbRecoBtn").textContent = t.recoBtn;
+
+      const scoreText = document.getElementById("scoreOut").textContent;
+      if(scoreText !== "—"){
+        calc(true);
+      }else{
+        document.getElementById("modelOut").textContent = t.model + ": —";
+        document.getElementById("rbModel").textContent = "—";
+        document.getElementById("rbScore").textContent = t.rbScoreLabel + ": —";
+        document.getElementById("rbR1").textContent = t.rbR1Label + ": —";
+        document.getElementById("rbR2").textContent = t.rbR2Label + ": —";
+        document.getElementById("rbCat").textContent = "—";
+        lastRecoKey = null;
+        document.getElementById("rbRecoBtn").classList.add("hidden");
+      }
+    }
+
+    function scoreFromInputs(){
+      const n =
+        (Number(document.getElementById('f1').value) || 0) +
+        (Number(document.getElementById('f2').value) || 0) +
+        (Number(document.getElementById('f3').value) || 0);
+
+      let ptsFeat = 0;
+      if(n===1) ptsFeat = 4;
+      else if(n>=2) ptsFeat = 5;
+
+      const cctRaw = document.getElementById('cct').value;
+      const c = Number(cctRaw);
+      let ptsCct = 0;
+      if(cctRaw!==""){
+        if(c>550 && c<610) ptsCct = 1;
+        else if(c>=610 && c<=651) ptsCct = 2;
+        else if(c>=652) ptsCct = 3;
+      }
+
+      const dRaw = document.getElementById('dens').value;
+      const d = Number(dRaw);
+      let ptsD = 0;
+      let useExt = false;
+      if(dRaw!==""){
+        useExt = true;
+        if(d>=21.2) ptsD = 4;
+      }
+
+      return {score: ptsFeat + ptsCct + ptsD, useExt};
+    }
+
+    function validateInputs(){
+      const cctInput = document.getElementById('cct');
+      const densInput = document.getElementById('dens');
+      const cctStr = cctInput.value.trim();
+      const densStr = densInput.value.trim();
+
+      if(cctStr!==""){
+        const c = Number(cctStr);
+        if(!Number.isFinite(c) || c < 400 || c > 800){
+          alert(lang==='es'
+            ? "La paquimetría debe estar entre 400 y 800 µm."
+            : "Pachymetry must be between 400 and 800 µm.");
+          return false;
+        }
+        if(!Number.isInteger(c)){
+          alert(lang==='es'
+            ? "La paquimetría debe introducirse sin decimales."
+            : "Pachymetry must be entered without decimals.");
+          return false;
+        }
+      }
+
+      if(densStr!==""){
+        const d = Number(densStr);
+        if(!Number.isFinite(d) || d < 10 || d > 50){
+          alert(lang==='es'
+            ? "La densitometría media central debe estar entre 10 y 50."
+            : "Central mean densitometry must be between 10 and 50.");
+          return false;
+        }
+        const idx = densStr.indexOf('.');
+        if(idx !== -1 && densStr.length - idx - 1 > 1){
+          alert(lang==='es'
+            ? "La densitometría solo puede tener un decimal."
+            : "Densitometry may have at most one decimal place.");
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function riskCox(score,beta,s0){
+      return 1 - Math.pow(s0, Math.exp(beta * score));
+    }
+    function fmtPct(x){
+      return Number.isFinite(x) ? (x*100).toFixed(1) + "%" : "—";
+    }
+
+    function classifyRisk(r1){
+      const t = T[lang];
+      if(!Number.isFinite(r1)) return {key:null, txt:"—", cls:""};
+      if(r1 < 0.05)  return {key:"vlow", txt:t.verylow, cls:"vlow"};
+      if(r1 < 0.20)  return {key:"low",  txt:t.low,    cls:"low"};
+      if(r1 <= 0.50) return {key:"mid",  txt:t.mid,    cls:"mid"};
+      return {key:"high", txt:t.high, cls:"high"};
+    }
+
+    function calc(fromLangChange){
+      if(!fromLangChange && !acceptedTerms){
+        alert(lang === 'es'
+          ? "Debe leer y aceptar el aviso legal antes de utilizar la calculadora."
+          : "You must read and accept the legal notice before using the calculator.");
+        document.getElementById('welcomePanel').scrollIntoView({behavior:'smooth'});
+        return;
+      }
+
+      if(!fromLangChange && !validateInputs()) return;
+
+      const {score,useExt} = scoreFromInputs();
+      const t = T[lang];
+
+      document.getElementById("scoreOut").textContent = score;
+
+      const P = useExt ? PARAMS.ext : PARAMS.base;
+      const modelName = (lang==='es') ? P.nameES : P.nameEN;
+      document.getElementById("modelOut").textContent = t.model + ": " + modelName;
+      document.getElementById("betaChip").textContent = "β: " + P.beta.toFixed(5);
+
+      document.getElementById("rbModel").textContent = modelName;
+      document.getElementById("rbScore").textContent = t.rbScoreLabel + ": " + score;
+
+      const cctRaw = document.getElementById('cct').value;
+      if(cctRaw===""){
+        document.getElementById("r1").textContent = "—";
+        document.getElementById("r2").textContent = "—";
+        document.getElementById("r1band").textContent = "—";
+        document.getElementById("r1band").className = "chip";
+
+        document.getElementById("rbR1").textContent = t.rbR1Label + ": —";
+        document.getElementById("rbR2").textContent = t.rbR2Label + ": —";
+        document.getElementById("rbCat").textContent = "—";
+
+        lastRecoKey = null;
+        document.getElementById("rbRecoBtn").classList.add("hidden");
+        return;
+      }
+
+      const r1 = riskCox(score, P.beta, P.s01);
+      const r2 = riskCox(score, P.beta, P.s02);
+
+      const r1Text = fmtPct(r1);
+      const r2Text = fmtPct(r2);
+      document.getElementById("r1").textContent = r1Text;
+      document.getElementById("r2").textContent = r2Text;
+
+      const band = classifyRisk(r1);
+      lastRecoKey = band.key;
+
+      const el = document.getElementById("r1band");
+      el.textContent = band.txt;
+      el.className = "chip " + band.cls;
+
+      document.getElementById("rbR1").textContent = t.rbR1Label + ": " + r1Text;
+      document.getElementById("rbR2").textContent = t.rbR2Label + ": " + r2Text;
+      document.getElementById("rbCat").textContent = band.txt;
+
+      // Mostrar/ocultar botón recomendación
+      const recoBtn = document.getElementById("rbRecoBtn");
+      if(lastRecoKey && T[lang].recoTexts && T[lang].recoTexts[lastRecoKey]){
+        recoBtn.classList.remove("hidden");
+        recoBtn.textContent = T[lang].recoBtn;
+      } else {
+        recoBtn.classList.add("hidden");
+      }
+    }
+
+    function resetAll(){
+      document.querySelectorAll('.toggle-group').forEach(group=>{
+        const hidden = document.getElementById(group.dataset.feature);
+        hidden.value = 0;
+        group.querySelectorAll('.toggle-btn').forEach(btn=>{
+          btn.classList.toggle('active', btn.dataset.value==="0");
+        });
+      });
+
+      document.getElementById('cct').value="";
+      document.getElementById('dens').value="";
+      document.getElementById('scoreOut').textContent="—";
+      document.getElementById('r1').textContent="—";
+      document.getElementById('r2').textContent="—";
+      document.getElementById('r1band').textContent="—";
+      document.getElementById('r1band').className="chip";
+      document.getElementById('betaChip').textContent="β: —";
+      document.getElementById('modelOut').textContent = T[lang].model + ": —";
+
+      const t = T[lang];
+      document.getElementById("rbModel").textContent = "—";
+      document.getElementById("rbScore").textContent = t.rbScoreLabel + ": —";
+      document.getElementById("rbR1").textContent = t.rbR1Label + ": —";
+      document.getElementById("rbR2").textContent = t.rbR2Label + ": —";
+      document.getElementById("rbCat").textContent = "—";
+
+      lastRecoKey = null;
+      document.getElementById("rbRecoBtn").classList.add("hidden");
+    }
+
+    document.getElementById('calcBtn').addEventListener('click', ()=>calc(false));
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+    // Cambio idioma
+    document.querySelectorAll('.lang button').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.lang button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        setLang(btn.dataset.lang);
+      });
+    });
+
+    // Toggles Sí/No
+    document.querySelectorAll('.toggle-group').forEach(group=>{
+      const feature = group.dataset.feature;
+      const hidden = document.getElementById(feature);
+      group.querySelectorAll('.toggle-btn').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          group.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          hidden.value = btn.dataset.value;
+        });
+      });
+    });
+
+    // Modales
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalClose = document.getElementById('modalClose');
+
+    function openModal(key){
+      const mc = modalContents[key];
+      if(!mc) return;
+      modalTitle.textContent = mc.title[lang];
+      modalBody.innerHTML = mc.body[lang];
+      modalOverlay.classList.remove('hidden');
+      modalOverlay.setAttribute('aria-hidden','false');
+    }
+    function closeModal(){
+      modalOverlay.classList.add('hidden');
+      modalOverlay.setAttribute('aria-hidden','true');
+    }
+
+    // Modal de recomendaciones desde el banner
+    function openRecoFromBanner(){
+      const t = T[lang];
+      const scoreText = document.getElementById("scoreOut").textContent;
+      const cctRaw = document.getElementById("cct").value;
+
+      modalTitle.textContent = t.recoTitle;
+
+      if(scoreText === "—" || !lastRecoKey || cctRaw === ""){
+        modalBody.innerHTML = `<p>${t.recoNoRisk}</p>`;
+      } else {
+        const txt = (t.recoTexts && t.recoTexts[lastRecoKey]) ? t.recoTexts[lastRecoKey] : t.recoNoRisk;
+        modalBody.innerHTML = `
+          <p>${txt}</p>
+          <p class="hint">${t.recoDisclaimer}</p>
+        `;
+      }
+
+      modalOverlay.classList.remove('hidden');
+      modalOverlay.setAttribute('aria-hidden','false');
+    }
+
+    document.querySelectorAll('.info-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>openModal(btn.dataset.modal));
+    });
+    modalClose.addEventListener('click',closeModal);
+    modalOverlay.addEventListener('click',e=>{
+      if(e.target===modalOverlay) closeModal();
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==="Escape") closeModal();
+    });
+
+    // Botón de recomendación del banner
+    document.getElementById('rbRecoBtn').addEventListener('click', openRecoFromBanner);
+
+    // Panel bienvenida: aceptar siempre en cada sesión
+    const welcomePanel = document.getElementById('welcomePanel');
+    document.getElementById('wAccept').addEventListener('click', ()=>{
+      acceptedTerms = true;
+      welcomePanel.style.display = 'none';
+      const sum = document.getElementById('lSum');
+      if(sum && sum.parentElement && sum.parentElement.tagName.toLowerCase()==='details'){
+        sum.parentElement.open = false;
+      }
+    });
+    document.getElementById('wShowLegal').addEventListener('click', ()=>{
+      const sum = document.getElementById('lSum');
+      if(sum && sum.parentElement && sum.parentElement.tagName.toLowerCase()==='details'){
+        sum.parentElement.open = true;
+        sum.parentElement.scrollIntoView({behavior:'smooth'});
+      } else {
+        document.getElementById('lSum').scrollIntoView({behavior:'smooth'});
+      }
+    });
+
+    // DETAILS tipo acordeón
+    const allDetails = document.querySelectorAll('details');
+    allDetails.forEach(d=>{
+      d.addEventListener('toggle', ()=>{
+        if(d.open){
+          allDetails.forEach(o=>{ if(o!==d) o.open=false; });
+        }
+      });
+    });
+
+    // Init
+    setLang('es');
+  </script>
+</body>
+</html>
+
