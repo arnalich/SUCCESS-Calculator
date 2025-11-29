@@ -437,7 +437,7 @@
         </p>
 
         <div class="row">
-          <span class="label-text" id="l1">Pérdida de isopacas regulares</span>
+          <span class="label-text" id="l1">Pérdida de regularidad de bandas isopaquimétricas</span>
           <div class="toggle-group" data-feature="f1">
             <button type="button" class="toggle-btn" data-value="1">Sí</button>
             <button type="button" class="toggle-btn active" data-value="0">No</button>
@@ -577,15 +577,15 @@
     const PARAMS = {
       base: {
         beta: 0.48943,
-        s01: 0.980,   // recalibrado: score 7 ~61%, score 8 ~78% a 1 año
-        s02: 0.964,   // ~+5% a 2 años
+        s01: 0.975,   // recalibrado: score 7 ~61%, score 8 ~78% a 1 año
+        s02: 0.972,   // ~+5% a 2 años
         nameES:"SUCCESS (base)",
         nameEN:"SUCCESS (base)"
       },
       ext: {
         beta: 0.41163,
-        s01: 0.987,   // misma calibración base para coherencia
-        s02: 0.976,
+        s01: 0.984,   // misma calibración base para coherencia
+        s02: 0.982,
         nameES:"SUCCESS-Extended",
         nameEN:"SUCCESS-Extended"
       }
@@ -1036,8 +1036,8 @@
             and risk as <code>R(t) = 1 − S(t | s)</code>.
           </p>
           <ul>
-            <li><strong>Base SUCCESS</strong>: β = 0.48943; S₀(1 year) ≈ 0.970; S₀(2 years) ≈ 0.965.</li>
-            <li><strong>SUCCESS-Extended</strong>: β = 0.41163; S₀(1 year) ≈ 0.970; S₀(2 years) ≈ 0.965.</li>
+            <li><strong>Base SUCCESS</strong>: β = 0.48943; S₀(1 year) ≈ 0.975; S₀(2 years) ≈ 0.972.</li>
+            <li><strong>SUCCESS-Extended</strong>: β = 0.41163; S₀(1 year) ≈ 0.984; S₀(2 years) ≈ 0.982.</li>
           </ul>
           <p>
             In SUCCESS-Extended, central mean densitometry is added to the original model
