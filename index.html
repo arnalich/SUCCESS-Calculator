@@ -59,14 +59,7 @@
       background:rgba(15,23,42,.25);
       font-weight:600;
     }
-    #rbRecoBtn{
-      color:#e0f2fe;              /* texto celeste clarito */
-     border-color:rgba(255,255,255,.6);
-       background:rgba(15,23,42,.18);
-    }
-      #rbRecoBtn:hover{
-       background:rgba(15,23,42,.08);
-     }
+
     .wrap{
       max-width:1100px;
       margin:24px auto 40px;
@@ -375,17 +368,13 @@
   </style>
 </head>
 <body>
-  <!-- BANNER SUPERIOR -->
+  <!-- BANNER SUPERIOR (sin botón de recomendación) -->
   <div id="riskBanner">
     <span id="rbModel" class="rb-pill">—</span>
     <span id="rbScore" class="rb-pill">Score: —</span>
     <span id="rbR1" class="rb-main">Riesgo 1 año: —</span>
     <span id="rbR2" class="rb-main">Riesgo 2 años: —</span>
     <span id="rbCat" class="rb-pill rb-cat-pill">—</span>
-    <!-- Botón para ver recomendación -->
-    <button id="rbRecoBtn" type="button" class="rb-pill rb-cat-pill hidden">
-      Ver recomendación
-    </button>
   </div>
 
   <div class="wrap">
@@ -398,13 +387,12 @@
       <div class="title-row">
         <div class="main-title">
           <h1 id="title">Calculadora de riesgo SUCCESS / SUCCESS-Extended</h1>
-          <span class="badge" id="badge">Estimador del riesgo de queratoplastia endotelial</span>
+          <span class="badge" id="badge">Estimador del riesgo de queratoplastia endotelial (uso académico / investigación)</span>
         </div>
         <p class="sub-title" id="intro">
-          Estima el riesgo de necesitar queratoplastia endotelial por visión subóptima
-          tras cirugía de cataratas en pacientes con distrofia endotelial de Fuchs (FECD),
-          a 1 y 2 años. Cálculo local; no se almacenan datos. Solo deben utilizarse
-          exploraciones Pentacam® con calidad QS óptima.
+          Estima, con fines académicos y de investigación, el riesgo de necesitar queratoplastia endotelial por visión subóptima
+          tras cirugía de cataratas en pacientes con distrofia endotelial de Fuchs (FECD), a 1 y 2 años. Cálculo local; no se almacenan datos.
+          Solo deben utilizarse exploraciones Pentacam® con calidad QS óptima. No está destinada a la toma de decisiones clínicas.
         </p>
       </div>
 
@@ -416,8 +404,9 @@
       <h2 id="wTitle">Bienvenido/a a la calculadora de riesgo SUCCESS / SUCCESS-Extended</h2>
       <p id="wText">
         Antes de utilizar esta herramienta, lea el apartado “Aviso legal ampliado” que figura más abajo,
-        donde se describen su finalidad, limitaciones y condiciones de uso. El uso de la calculadora implica
-        que usted es profesional sanitario y que acepta dichas condiciones.
+        donde se describen su finalidad, limitaciones y condiciones de uso. La herramienta tiene un propósito
+        exclusivamente académico y de investigación, y no está destinada a apoyar decisiones clínicas ni a sustituir
+        el juicio médico. El uso de la calculadora implica que usted es profesional sanitario y que acepta dichas condiciones.
       </p>
       <div id="welcomeButtons">
         <button class="btn primary" id="wAccept">He leído y acepto</button>
@@ -516,7 +505,7 @@
         <div style="height:8px"></div>
 
         <div class="kpi">
-          <div class="kpi-label" id="riskLbl">Probabilidad estimada</div>
+          <div class="kpi-label" id="riskLbl">Probabilidad estimada (uso académico)</div>
           <div class="kpi-main">
             <div class="risk-block">
               <div class="kpi-val mono" id="r1">—</div>
@@ -561,7 +550,7 @@
     </section>
   </div>
 
-  <!-- MODAL EXPLICATIVO / RECOMENDACIONES -->
+  <!-- MODAL EXPLICATIVO (solo info técnica, sin recomendaciones) -->
   <div id="modalOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal">
       <div class="modal-header">
@@ -573,18 +562,20 @@
   </div>
 
   <script>
-    // Parámetros recalibrados
+    // Parámetros recalibrados (valores proporcionados):
+    // SUCCESS base: S0(1 año) = 0.975; S0(2 años) = 0.972
+    // SUCCESS-Extended: S0(1 año) = 0.984; S0(2 años) = 0.982
     const PARAMS = {
       base: {
         beta: 0.48943,
-        s01: 0.975,   // recalibrado: score 7 ~61%, score 8 ~78% a 1 año
-        s02: 0.972,   // ~+5% a 2 años
+        s01: 0.975,
+        s02: 0.972,
         nameES:"SUCCESS (base)",
         nameEN:"SUCCESS (base)"
       },
       ext: {
         beta: 0.41163,
-        s01: 0.984,   // misma calibración base para coherencia
+        s01: 0.984,
         s02: 0.982,
         nameES:"SUCCESS-Extended",
         nameEN:"SUCCESS-Extended"
@@ -593,7 +584,6 @@
 
     let lang = 'es';
     let acceptedTerms = false;
-    let lastRecoKey = null; // clave de la última banda de riesgo
 
     const modalContents = {
       isopachs:{
@@ -706,15 +696,14 @@
     const T = {
       es:{
         title:"Calculadora de riesgo SUCCESS / SUCCESS-Extended",
-        badge:"Estimador del riesgo de queratoplastia endotelial",
-        intro:`Estima el riesgo de necesitar queratoplastia endotelial por visión subóptima
-               tras cirugía de cataratas en pacientes con distrofia endotelial de Fuchs (FECD),
-               a 1 y 2 años. Cálculo local; no se almacenan datos. Solo deben utilizarse
-               exploraciones Pentacam® con calidad QS óptima.`,
+        badge:"Estimador del riesgo de queratoplastia endotelial (uso académico / investigación)",
+        intro:`Estima, con fines académicos y de investigación, el riesgo de necesitar queratoplastia endotelial
+               por visión subóptima tras cirugía de cataratas en pacientes con distrofia endotelial de Fuchs (FECD),
+               a 1 y 2 años. El cálculo es local y no se almacenan datos. No está destinada a la toma de decisiones clínicas.`,
         wTitle:"Bienvenido/a a la calculadora de riesgo SUCCESS / SUCCESS-Extended",
         wText:`Antes de utilizar esta herramienta, lea el apartado “Aviso legal ampliado” que figura más abajo,
-               donde se describen su finalidad, limitaciones y condiciones de uso. El uso de la calculadora implica
-               que usted es profesional sanitario y que acepta dichas condiciones.`,
+               donde se describen su finalidad, limitaciones y condiciones de uso. La herramienta tiene un propósito
+               exclusivamente académico y de investigación, y no está destinada a apoyar decisiones clínicas.`,
         wAccept:"He leído y acepto",
         wShowLegal:"Ver aviso legal",
 
@@ -736,7 +725,7 @@
         localNote:"El cálculo se realiza íntegramente en su navegador; no se envían ni almacenan datos.",
         secRes:"Resultados",
         scoreLbl:"Score SUCCESS / SUCCESS-Extended",
-        riskLbl:"Probabilidad estimada",
+        riskLbl:"Probabilidad estimada (uso académico)",
         r1lbl:"A 1 año",
         r2lbl:"A 2 años",
         infoSec:"Información, financiación y aviso legal",
@@ -752,60 +741,19 @@
         rbScoreLabel:"Score",
         rbR1Label:"Riesgo 1 año",
         rbR2Label:"Riesgo 2 años",
-        bandsLegend:`<strong>En este estudio, el riesgo a 1 año se clasifica como:</strong><br>
+        bandsLegend:`<strong>En este estudio, el riesgo a 1 año se clasifica como (con fines académicos):</strong><br>
           Muy bajo: &lt;5%<br>
           Bajo: 5–&lt;20%<br>
           Intermedio: 20–50%<br>
           Alto: &gt;50%`,
 
-        // Textos recomendación
-        recoBtn:"Ver recomendación",
-        recoTitle:"Recomendación orientativa según riesgo",
-        recoNoRisk:"Calcule primero el riesgo (introduzca los datos y pulse «Calcular riesgo») para ver una recomendación orientativa.",
-        recoDisclaimer:`
-          Las recomendaciones anteriores son orientativas, se basan en el riesgo estimado por los modelos SUCCESS / SUCCESS-Extended
-          y no sustituyen el juicio clínico individual ni las guías locales. Deben aplicarse únicamente en contextos similares a la cohorte
-          de desarrollo (cataratas sin complicaciones mayores). En situaciones extremas, como cataratas muy duras, cámaras anteriores muy
-          estrechas, mala dilatación, sinequias, cirugía de glaucoma o cirugía intraocular previa compleja, las probabilidades reales de
-          descompensación corneal pueden diferir de las estimadas y la decisión debe basarse en una valoración clínica completa.
-        `,
-        recoTexts:{
-          vlow:`
-            Riesgo muy bajo (&lt;5% a 1 año). En esta situación suele recomendarse cirugía de cataratas mediante facoemulsificación
-            con medidas estándar de protección endotelial (control de energía, uso adecuado de viscoelásticos protectores, etc.),
-            realizada por un cirujano con experiencia en cirugía de cataratas en un centro con volumen y recursos adecuados.
-            No es aconsejable que la cirugía la realice un cirujano muy junior sin supervisión directa, aunque el modelo sugiera
-            un riesgo bajo de queratoplastia endotelial.
-          `,
-          low:`
-            Riesgo bajo (5–&lt;20% a 1 año). En general puede plantearse una cirugía de cataratas estándar en un centro que cuente
-            con experiencia en cirugía de cataratas y/o disponga de una vía clara de derivación ágil a una unidad de córnea o a
-            un centro donde se realice queratoplastia endotelial, en caso de descompensación corneal posoperatoria. Es recomendable
-            informar al paciente de este riesgo, acordar un plan de seguimiento y asegurarse de que existe un circuito eficiente
-            de derivación.
-          `,
-          mid:`
-            Riesgo intermedio (20–50% a 1 año). Se recomienda explicar de forma detallada al paciente el riesgo de descompensación
-            corneal y la posible necesidad de cirugía de trasplante endotelial en el futuro. La cirugía debería programarse con un
-            especialista en cataratas con experiencia en patología corneal, preferiblemente en un centro con capacidad para realizar
-            queratoplastia endotelial. Es aconsejable organizar de antemano un circuito asistencial que contemple la eventual necesidad
-            de trasplante de rescate y un seguimiento estrecho durante el primer año posoperatorio.
-          `,
-          high:`
-            Riesgo alto (&gt;50% a 1 año). En este contexto, la decisión debe individualizarse y discutirse cuidadosamente con el paciente.
-            Puede considerarse la cirugía en centros con amplia experiencia en queratoplastia endotelial y, en algunos casos, valorar
-            una cirugía combinada (faco + queratoplastia endotelial) o una estrategia escalonada (queratoplastia primero y cirugía de
-            cataratas posteriormente) para optimizar la predictibilidad refractiva y la recuperación visual. Es esencial documentar la
-            información facilitada y las preferencias del paciente.
-          `
-        },
-
         mTxtHTML: `
           <p>
             El acrónimo <strong>SUCCESS</strong> corresponde a
             <em>SUbClinical Corneal Edema Scheimpflug Study</em>. El modelo combina
-            hallazgos tomográficos centrales y paquimetría para estimar el riesgo de
-            requerir queratoplastia endotelial tras cirugía de cataratas en FECD.
+            hallazgos tomográficos centrales y paquimetría para estimar, con fines de
+            investigación, el riesgo de requerir queratoplastia endotelial tras cirugía
+            de cataratas en FECD.
           </p>
           <p>
             La función de supervivencia condicional se calcula como
@@ -813,8 +761,8 @@
             y el riesgo estimado es <code>R(t) = 1 − S(t | s)</code>.
           </p>
           <ul>
-            <li><strong>SUCCESS base</strong>: β = 0.48943; S₀(1 año) ≈ 0.970; S₀(2 años) ≈ 0.965.</li>
-            <li><strong>SUCCESS-Extended</strong>: β = 0.41163; S₀(1 año) ≈ 0.970; S₀(2 años) ≈ 0.965.</li>
+            <li><strong>SUCCESS base</strong>: β = 0.48943; S₀(1 año) = 0.975; S₀(2 años) = 0.972.</li>
+            <li><strong>SUCCESS-Extended</strong>: β = 0.41163; S₀(1 año) = 0.984; S₀(2 años) = 0.982.</li>
           </ul>
           <p>
             En SUCCESS-Extended se añade la variable de densitometría media central, no incluida en el
@@ -839,11 +787,10 @@
           </p>
           <p>
             Como en cualquier modelo predictivo preoperatorio, los factores intraoperatorios no se capturan por completo.
-            El algoritmo SUCCESS está diseñado para estimar el riesgo <em>antes</em> de la cirugía y no incorpora la
-            variabilidad asociada a <strong>situaciones extremas</strong> (por ejemplo, cristalinos muy duros, cámaras
-            anteriores estrechas, tiempos quirúrgicos prolongados), ni las complicaciones intraoperatorias ni la curva
-            de aprendizaje del cirujano. El modelo está pensado para casos de facoemulsificación no complicada
-            (<em>“straightforward cataracts”</em>).
+            El algoritmo SUCCESS está diseñado para estimar el riesgo <em>antes</em> de la cirugía en el contexto del estudio
+            y no incorpora la variabilidad asociada a <strong>situaciones extremas</strong> (por ejemplo, cristalinos muy duros,
+            cámaras anteriores estrechas, tiempos quirúrgicos prolongados), ni las complicaciones intraoperatorias ni la curva
+            de aprendizaje del cirujano.
           </p>
           <p>
             El modelo está calibrado específicamente para tomografía de Scheimpflug obtenida con Pentacam®.
@@ -865,7 +812,8 @@
           </ul>
           <p class="hint">
             Se recomienda definir un protocolo interno que especifique qué pantallas revisar
-            sistemáticamente antes de introducir los datos en la calculadora.
+            sistemáticamente antes de introducir los datos en la calculadora, en el marco de proyectos
+            de investigación o auditoría clínica.
           </p>
         `,
 
@@ -886,23 +834,24 @@
         lTxtHTML: `
           <p><strong>Alcance y naturaleza de la herramienta</strong></p>
           <p>
-            Esta calculadora se ha diseñado como herramienta de apoyo a la decisión clínica y de
-            investigación. No constituye un <em>producto sanitario</em> ni un dispositivo médico
-            certificado conforme al Reglamento (UE) 2017/745 (MDR) ni a la normativa estadounidense
-            (FDA). No dispone de marcado CE ni de autorización regulatoria para su uso como
+            Esta calculadora se ha diseñado como herramienta <strong>académica y de investigación</strong>
+            sobre modelos predictivos. No está destinada a apoyar decisiones clínicas individuales ni a
+            sustituir el juicio de un profesional sanitario, y <strong>no constituye un “producto sanitario”</strong>
+            ni un dispositivo médico certificado conforme al Reglamento (UE) 2017/745 (MDR) ni a la normativa
+            estadounidense (FDA). No dispone de marcado CE ni de autorización regulatoria para su uso como
             herramienta diagnóstica o de indicación terapéutica.
           </p>
           <p><strong>Limitaciones de uso</strong></p>
           <ul>
-            <li>No debe utilizarse como única base para indicar o descartar cirugía de córnea o catarata.</li>
+            <li>No debe utilizarse como base para indicar o descartar cirugía de córnea o catarata en un paciente concreto.</li>
             <li>No está destinada a uso directo por pacientes ni por personal no especializado.</li>
             <li>
-              Solo es aplicable a exploraciones realizadas con Pentacam® (tomografía de Scheimpflug)
-              con calidad QS óptima y en un contexto clínico similar al de la cohorte de desarrollo.
+              Su uso se circunscribe a contextos de investigación, docencia, auditoría clínica o discusión académica,
+              y siempre debe interpretarse en relación con la publicación original y el diseño del estudio.
             </li>
             <li>
-              Los resultados deben interpretarse siempre junto con la historia clínica, la exploración
-              oftalmológica completa y el criterio del especialista.
+              Los resultados no deben interpretarse como recomendaciones clínicas ni como sustituto de la valoración
+              integral del paciente.
             </li>
           </ul>
           <p><strong>Responsabilidad</strong></p>
@@ -910,14 +859,13 @@
             Aunque se han seguido buenas prácticas metodológicas en el desarrollo del modelo,
             los autores, las instituciones participantes y los organismos financiadores no
             garantizan la exactitud ni la exhaustividad de las estimaciones proporcionadas.
-            El uso de la herramienta se realiza bajo la exclusiva responsabilidad del profesional
-            que la consulta.
+            El uso de la herramienta con cualquier finalidad recae bajo la exclusiva responsabilidad
+            del usuario.
           </p>
           <p>
             Ni los autores, ni sus instituciones, ni el ISCIII, ni la Unión Europea asumirán
-            responsabilidad legal por daños directos o indirectos derivados del uso clínico,
-            quirúrgico o de cualquier otra naturaleza que se base de forma exclusiva o
-            predominante en los resultados de esta calculadora.
+            responsabilidad legal por daños directos o indirectos derivados de decisiones clínicas
+            o quirúrgicas que se basen, total o parcialmente, en los resultados de esta calculadora.
           </p>
           <p><strong>Protección de datos</strong></p>
           <p>
@@ -930,15 +878,15 @@
 
       en:{
         title:"SUCCESS / SUCCESS-Extended Risk Calculator",
-        badge:"Risk estimator for endothelial keratoplasty",
-        intro:`Estimates the 1- and 2-year risk of requiring endothelial keratoplasty for
-               suboptimal vision after cataract surgery in FECD patients. Local computation;
-               no data are stored. Only Pentacam® scans with optimal QS quality should be used.`,
+        badge:"Risk estimator for endothelial keratoplasty (academic / research use)",
+        intro:`Estimates, for academic and research purposes, the 1- and 2-year risk of requiring endothelial
+               keratoplasty for suboptimal vision after cataract surgery in FECD patients. All computations are
+               performed locally and no data are stored. The tool is <strong>not</strong> intended for clinical
+               decision-making.`,
         wTitle:"Welcome to the SUCCESS / SUCCESS-Extended Risk Calculator",
-        wText:`Before using this tool, please read the “Extended legal notice” section below,
-               where its purpose, limitations and conditions of use are described. Using the
-               calculator implies that you are a healthcare professional and that you accept
-               these conditions.`,
+        wText:`Before using this tool, please read the “Extended legal notice” section below, where its
+               purpose, limitations and conditions of use are described. The calculator is intended solely for
+               academic and research purposes and is not meant to support clinical decision-making.`,
         wAccept:"I have read and accept",
         wShowLegal:"View legal notice",
 
@@ -960,7 +908,7 @@
         localNote:"All computations run locally in your browser; no data are sent or stored.",
         secRes:"Results",
         scoreLbl:"SUCCESS / SUCCESS-Extended score",
-        riskLbl:"Estimated probability",
+        riskLbl:"Estimated probability (academic use)",
         r1lbl:"At 1 year",
         r2lbl:"At 2 years",
         infoSec:"Information, funding and legal notice",
@@ -976,59 +924,18 @@
         rbScoreLabel:"Score",
         rbR1Label:"1-year risk",
         rbR2Label:"2-year risk",
-        bandsLegend:`<strong>In this study, 1-year risk is categorised as:</strong><br>
+        bandsLegend:`<strong>In this study, 1-year risk is categorised as (for academic use):</strong><br>
           Very low: &lt;5%<br>
           Low: 5–&lt;20%<br>
           Intermediate: 20–50%<br>
           High: &gt;50%`,
 
-        // Recommendation texts
-        recoBtn:"View recommendation",
-        recoTitle:"Suggested plan according to risk",
-        recoNoRisk:"Please calculate the risk first (enter the data and click “Calculate risk”) to see a suggested plan.",
-        recoDisclaimer:`
-          The suggestions above are purely orientative, based on the risk estimated by the SUCCESS / SUCCESS-Extended models,
-          and do not replace individual clinical judgement or local guidelines. They should only be applied in settings similar
-          to the development cohort (uncomplicated cataract surgery). In extreme situations such as very hard cataracts, shallow
-          anterior chambers, poor dilation, synechiae, glaucoma surgery or complex previous intraocular surgery, the actual risk
-          of corneal decompensation may differ from the estimate and decisions should rely on a comprehensive clinical assessment.
-        `,
-        recoTexts:{
-          vlow:`
-            Very low risk (&lt;5% at 1 year). In this scenario, cataract surgery by phacoemulsification with standard endothelial
-            protection measures (careful energy management, appropriate use of protective viscoelastics, etc.) is usually
-            recommended, performed by an experienced cataract surgeon in a centre with adequate volume and resources. It is not
-            advisable for a very junior surgeon to perform the procedure without direct supervision, even if the model suggests
-            a low probability of endothelial keratoplasty.
-          `,
-          low:`
-            Low risk (5–&lt;20% at 1 year). Standard cataract surgery can generally be planned in a centre with experience in cataract
-            surgery and/or a clearly established referral pathway to a corneal unit where endothelial keratoplasty is available,
-            should postoperative corneal decompensation occur. It is advisable to inform the patient about this risk, agree on a
-            follow-up plan and ensure that an efficient referral circuit is in place.
-          `,
-          mid:`
-            Intermediate risk (20–50% at 1 year). A detailed discussion with the patient about the risk of corneal decompensation
-            and the potential need for endothelial keratoplasty is recommended. Surgery should preferably be scheduled with a cataract
-            specialist experienced in corneal disease, ideally in a centre with endothelial keratoplasty capability. It is advisable to
-            arrange in advance an assistance pathway that includes the possibility of rescue keratoplasty and close follow-up during the
-            first postoperative year.
-          `,
-          high:`
-            High risk (&gt;50% at 1 year). In this context, decisions should be highly individualised and carefully discussed with the patient.
-            Surgery should be considered in centres with extensive experience in endothelial keratoplasty and, in some cases, a combined
-            procedure (phaco + endothelial keratoplasty) or a staged strategy (keratoplasty first and cataract surgery later) may be
-            considered to improve refractive predictability and visual recovery. It is essential to document the information given and
-            the patient’s preferences.
-          `
-        },
-
         mTxtHTML: `
           <p>
             <strong>SUCCESS</strong> stands for
             <em>SUbClinical Corneal Edema Scheimpflug Study</em>. The model combines central
-            tomographic findings and pachymetry to estimate the risk of requiring endothelial
-            keratoplasty after cataract surgery in FECD patients.
+            tomographic findings and pachymetry to estimate, for research purposes, the risk of
+            requiring endothelial keratoplasty after cataract surgery in FECD patients.
           </p>
           <p>
             Conditional survival is computed as
@@ -1036,8 +943,8 @@
             and risk as <code>R(t) = 1 − S(t | s)</code>.
           </p>
           <ul>
-            <li><strong>Base SUCCESS</strong>: β = 0.48943; S₀(1 year) ≈ 0.975; S₀(2 years) ≈ 0.972.</li>
-            <li><strong>SUCCESS-Extended</strong>: β = 0.41163; S₀(1 year) ≈ 0.984; S₀(2 years) ≈ 0.982.</li>
+            <li><strong>Base SUCCESS</strong>: β = 0.48943; S₀(1 year) = 0.975; S₀(2 years) = 0.972.</li>
+            <li><strong>SUCCESS-Extended</strong>: β = 0.41163; S₀(1 year) = 0.984; S₀(2 years) = 0.982.</li>
           </ul>
           <p>
             In SUCCESS-Extended, central mean densitometry is added to the original model
@@ -1062,10 +969,10 @@
           </p>
           <p>
             As in any preoperative predictive model, intraoperative factors cannot be fully captured.
-            The SUCCESS algorithm is designed to estimate risk <em>before</em> surgery and does not incorporate
-            variability related to <strong>extreme situations</strong> such as very hard cataracts, shallow anterior
-            chambers or markedly prolonged surgical times, nor intraoperative complications or surgeon learning curves.
-            The model is intended for uncomplicated phacoemulsification cases (<em>“straightforward cataracts”</em>).
+            The SUCCESS algorithm is designed to estimate risk <em>before</em> surgery in the context of the
+            original study and does not incorporate variability related to <strong>extreme situations</strong>
+            such as very hard cataracts, shallow anterior chambers or markedly prolonged surgical times,
+            nor intraoperative complications or surgeon learning curves.
           </p>
           <p>
             The model has been calibrated specifically for Scheimpflug tomography acquired with
@@ -1088,7 +995,8 @@
           </ul>
           <p class="hint">
             We recommend defining an internal protocol specifying which Pentacam® screens should
-            be reviewed systematically before entering data into the calculator.
+            be reviewed systematically before entering data into the calculator, within the framework
+            of research projects or clinical audit.
           </p>
         `,
 
@@ -1109,35 +1017,33 @@
         lTxtHTML: `
           <p><strong>Scope and nature of the tool</strong></p>
           <p>
-            This calculator is intended as a clinical decision-support and research tool.
-            It does not constitute a <em>medical device</em> under EU Regulation 2017/745 (MDR)
-            or US FDA regulations. It has no CE marking and no regulatory approval as a
-            diagnostic or therapeutic decision-making device.
+            This calculator has been designed as an <strong>academic and research</strong> tool on predictive models.
+            It is not intended to support individual clinical decisions or to replace the judgement of a healthcare
+            professional, and it <strong>does not constitute a “medical device”</strong> under EU Regulation 2017/745 (MDR)
+            or US FDA regulations. It has no CE marking and no regulatory approval as a diagnostic or therapeutic
+            decision-making device.
           </p>
           <p><strong>Limitations of use</strong></p>
           <ul>
-            <li>It must not be used as the sole basis for indicating or withholding corneal or cataract surgery.</li>
+            <li>It must not be used as the basis for indicating or withholding corneal or cataract surgery in a given patient.</li>
             <li>It is not intended for direct use by patients or non-specialist staff.</li>
             <li>
-              It applies only to Pentacam® Scheimpflug scans with optimal QS quality and
-              in a clinical context similar to the development cohort.
+              Its use is restricted to research, teaching, clinical audit or academic discussion contexts, and results
+              should always be interpreted in relation to the original publication and study design.
             </li>
             <li>
-              Results must always be interpreted together with clinical history, full
-              ophthalmic examination and specialist judgement.
+              Results must not be interpreted as clinical recommendations or as a substitute for comprehensive patient assessment.
             </li>
           </ul>
           <p><strong>Liability</strong></p>
           <p>
-            Although good methodological practices have been followed, the authors,
-            participating institutions and funding bodies do not guarantee the accuracy
-            or completeness of the estimates provided. Use of the tool is under the sole
-            responsibility of the healthcare professional.
+            Although good methodological practices have been followed, the authors, participating institutions and funding
+            bodies do not guarantee the accuracy or completeness of the estimates provided. Any use of the tool is under
+            the sole responsibility of the user.
           </p>
           <p>
-            Neither the authors, nor their institutions, nor ISCIII, nor the European Union
-            shall be liable for any direct or indirect damages arising from clinical,
-            surgical or other decisions based exclusively or predominantly on this
+            Neither the authors, nor their institutions, nor ISCIII, nor the European Union shall be liable for any direct
+            or indirect damages arising from clinical, surgical or other decisions that rely, in whole or in part, on this
             calculator.
           </p>
           <p><strong>Data protection</strong></p>
@@ -1155,7 +1061,7 @@
 
       document.getElementById("title").textContent = t.title;
       document.getElementById("badge").textContent = t.badge;
-      document.getElementById("intro").textContent = t.intro;
+      document.getElementById("intro").innerHTML = t.intro;
 
       document.getElementById("wTitle").textContent = t.wTitle;
       document.getElementById("wText").textContent = t.wText;
@@ -1201,9 +1107,6 @@
       document.getElementById("fundingTxt").innerHTML = t.fundingTxtHTML;
       document.getElementById("lTxt").innerHTML = t.lTxtHTML;
 
-      // Texto del botón de recomendación del banner
-      document.getElementById("rbRecoBtn").textContent = t.recoBtn;
-
       const scoreText = document.getElementById("scoreOut").textContent;
       if(scoreText !== "—"){
         calc(true);
@@ -1214,8 +1117,6 @@
         document.getElementById("rbR1").textContent = t.rbR1Label + ": —";
         document.getElementById("rbR2").textContent = t.rbR2Label + ": —";
         document.getElementById("rbCat").textContent = "—";
-        lastRecoKey = null;
-        document.getElementById("rbRecoBtn").classList.add("hidden");
       }
     }
 
@@ -1300,11 +1201,11 @@
 
     function classifyRisk(r1){
       const t = T[lang];
-      if(!Number.isFinite(r1)) return {key:null, txt:"—", cls:""};
-      if(r1 < 0.05)  return {key:"vlow", txt:t.verylow, cls:"vlow"};
-      if(r1 < 0.20)  return {key:"low",  txt:t.low,    cls:"low"};
-      if(r1 <= 0.50) return {key:"mid",  txt:t.mid,    cls:"mid"};
-      return {key:"high", txt:t.high, cls:"high"};
+      if(!Number.isFinite(r1)) return {txt:"—", cls:""};
+      if(r1 < 0.05)  return {txt:t.verylow, cls:"vlow"};
+      if(r1 < 0.20)  return {txt:t.low,    cls:"low"};
+      if(r1 <= 0.50) return {txt:t.mid,    cls:"mid"};
+      return {txt:t.high, cls:"high"};
     }
 
     function calc(fromLangChange){
@@ -1342,8 +1243,6 @@
         document.getElementById("rbR2").textContent = t.rbR2Label + ": —";
         document.getElementById("rbCat").textContent = "—";
 
-        lastRecoKey = null;
-        document.getElementById("rbRecoBtn").classList.add("hidden");
         return;
       }
 
@@ -1356,7 +1255,6 @@
       document.getElementById("r2").textContent = r2Text;
 
       const band = classifyRisk(r1);
-      lastRecoKey = band.key;
 
       const el = document.getElementById("r1band");
       el.textContent = band.txt;
@@ -1365,15 +1263,6 @@
       document.getElementById("rbR1").textContent = t.rbR1Label + ": " + r1Text;
       document.getElementById("rbR2").textContent = t.rbR2Label + ": " + r2Text;
       document.getElementById("rbCat").textContent = band.txt;
-
-      // Mostrar/ocultar botón recomendación
-      const recoBtn = document.getElementById("rbRecoBtn");
-      if(lastRecoKey && T[lang].recoTexts && T[lang].recoTexts[lastRecoKey]){
-        recoBtn.classList.remove("hidden");
-        recoBtn.textContent = T[lang].recoBtn;
-      } else {
-        recoBtn.classList.add("hidden");
-      }
     }
 
     function resetAll(){
@@ -1401,9 +1290,6 @@
       document.getElementById("rbR1").textContent = t.rbR1Label + ": —";
       document.getElementById("rbR2").textContent = t.rbR2Label + ": —";
       document.getElementById("rbCat").textContent = "—";
-
-      lastRecoKey = null;
-      document.getElementById("rbRecoBtn").classList.add("hidden");
     }
 
     document.getElementById('calcBtn').addEventListener('click', ()=>calc(false));
@@ -1431,7 +1317,7 @@
       });
     });
 
-    // Modales
+    // Modales info
     const modalOverlay = document.getElementById('modalOverlay');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
@@ -1450,28 +1336,6 @@
       modalOverlay.setAttribute('aria-hidden','true');
     }
 
-    // Modal de recomendaciones desde el banner
-    function openRecoFromBanner(){
-      const t = T[lang];
-      const scoreText = document.getElementById("scoreOut").textContent;
-      const cctRaw = document.getElementById("cct").value;
-
-      modalTitle.textContent = t.recoTitle;
-
-      if(scoreText === "—" || !lastRecoKey || cctRaw === ""){
-        modalBody.innerHTML = `<p>${t.recoNoRisk}</p>`;
-      } else {
-        const txt = (t.recoTexts && t.recoTexts[lastRecoKey]) ? t.recoTexts[lastRecoKey] : t.recoNoRisk;
-        modalBody.innerHTML = `
-          <p>${txt}</p>
-          <p class="hint">${t.recoDisclaimer}</p>
-        `;
-      }
-
-      modalOverlay.classList.remove('hidden');
-      modalOverlay.setAttribute('aria-hidden','false');
-    }
-
     document.querySelectorAll('.info-btn').forEach(btn=>{
       btn.addEventListener('click',()=>openModal(btn.dataset.modal));
     });
@@ -1483,10 +1347,7 @@
       if(e.key==="Escape") closeModal();
     });
 
-    // Botón de recomendación del banner
-    document.getElementById('rbRecoBtn').addEventListener('click', openRecoFromBanner);
-
-    // Panel bienvenida: aceptar siempre en cada sesión
+    // Panel bienvenida
     const welcomePanel = document.getElementById('welcomePanel');
     document.getElementById('wAccept').addEventListener('click', ()=>{
       acceptedTerms = true;
@@ -1521,4 +1382,3 @@
   </script>
 </body>
 </html>
-
